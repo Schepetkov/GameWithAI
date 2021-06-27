@@ -40,7 +40,10 @@ void AHideAndSeekGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	PlayerController = NewPlayer;
+	if (NewPlayer && NewPlayer->GetPawn())
+	{
+		Player = NewPlayer->GetPawn();
+	}
 }
 
 void AHideAndSeekGameMode::SpawnActors(EGameObjectType InObjectType, int32 InCount)
@@ -50,10 +53,6 @@ void AHideAndSeekGameMode::SpawnActors(EGameObjectType InObjectType, int32 InCou
 	check(DefaultBotToSpawn);
 	check(DefaultItemToSpawn);
 	check(DefaulObstacleToSpawn);
-	check(PlayerController)
-
-	TArray<AActor*> FoundPlayers;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerBase::StaticClass(), FoundPlayers);
 
 	TArray<AActor*> FoundBots;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABotBase::StaticClass(), FoundBots);
@@ -75,30 +74,27 @@ void AHideAndSeekGameMode::SpawnActors(EGameObjectType InObjectType, int32 InCou
 			AllBots.Empty();
 		}
 
-		if (FoundPlayers.IsValidIndex(0))
+		if (Player)
 		{
-			if (APlayerBase* Player = Cast<APlayerBase>(FoundPlayers[0]))
+			for (int32 i = 0; i < InCount;)
 			{
-				for (int32 i = 0; i < InCount;)
+				FVector SpawnPoint = SpawnArea->GetRandomPoint();
+
+				float DistanceToPlayer = (SpawnPoint - Player->GetActorLocation()).Size();
+
+				if (DistanceToPlayer <= DistanceBotFromPlayer)
 				{
-					FVector SpawnPoint = SpawnArea->GetRandomPoint();
+					continue;
+				}
 
-					float DistanceToPlayer = (SpawnPoint - Player->GetActorLocation()).Size();
+				i++;
+				SpawnPoint.Z = 5.f;
+				Transform.SetLocation(SpawnPoint);
 
-					if (DistanceToPlayer <= DistanceBotFromPlayer)
-					{
-						continue;
-					}
-
-					i++;
-					SpawnPoint.Z = 5.f;
-					Transform.SetLocation(SpawnPoint);
-
-					if (ABotBase* SpawnedBot = CastChecked<ABotBase>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, DefaultBotToSpawn, Transform, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn)))
-					{
-						UGameplayStatics::FinishSpawningActor(SpawnedBot, Transform);
-						AllBots.Add(SpawnedBot);
-					}
+				if (ABotBase* SpawnedBot = CastChecked<ABotBase>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this, DefaultBotToSpawn, Transform, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn)))
+				{
+					UGameplayStatics::FinishSpawningActor(SpawnedBot, Transform);
+					AllBots.Add(SpawnedBot);
 				}
 			}
 		}
@@ -152,16 +148,13 @@ void AHideAndSeekGameMode::SpawnActors(EGameObjectType InObjectType, int32 InCou
 			FVector SpawnPoint = SpawnArea->GetRandomPoint();
 			SpawnPoint.Z = 0.f;
 			
-			if (FoundPlayers.IsValidIndex(0) && FoundBots.IsValidIndex(0) && FoundExit.IsValidIndex(0))
+			if (Player && FoundBots.IsValidIndex(0) && FoundExit.IsValidIndex(0))
 			{
-				if (APlayerBase* Player = Cast<APlayerBase>(FoundPlayers[0]))
-				{
-					float DistanceToPlayer = (SpawnPoint - Player->GetActorLocation()).Size();
+				float DistanceToPlayer = (SpawnPoint - Player->GetActorLocation()).Size();
 
-					if (DistanceToPlayer <= 300.f)
-					{
-						continue;
-					}
+				if (DistanceToPlayer <= 300.f)
+				{
+					continue;
 				}
 				
 				if (AActor* ExitSpot = FoundExit[0])

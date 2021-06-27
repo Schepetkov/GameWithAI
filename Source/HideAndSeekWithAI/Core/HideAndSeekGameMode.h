@@ -30,7 +30,7 @@ protected:
 	ASpawnArea* SpawnArea = nullptr;
 
 	UPROPERTY(BlueprintReadOnly)
-	APlayerController* PlayerController = nullptr;
+	APawn* Player = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float DistanceBotFromPlayer;
