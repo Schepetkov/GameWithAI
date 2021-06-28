@@ -42,7 +42,7 @@ void AHideAndSeekGameMode::PostLogin(APlayerController* NewPlayer)
 
 	if (NewPlayer && NewPlayer->GetPawn())
 	{
-		Player = NewPlayer->GetPawn();
+		PlayerPawn = NewPlayer->GetPawn();
 	}
 }
 
@@ -74,13 +74,13 @@ void AHideAndSeekGameMode::SpawnActors(EGameObjectType InObjectType, int32 InCou
 			AllBots.Empty();
 		}
 
-		if (Player)
+		if (PlayerPawn)
 		{
 			for (int32 i = 0; i < InCount;)
 			{
 				FVector SpawnPoint = SpawnArea->GetRandomPoint();
 
-				float DistanceToPlayer = (SpawnPoint - Player->GetActorLocation()).Size();
+				float DistanceToPlayer = (SpawnPoint - PlayerPawn->GetActorLocation()).Size();
 
 				if (DistanceToPlayer <= DistanceBotFromPlayer)
 				{
@@ -148,9 +148,9 @@ void AHideAndSeekGameMode::SpawnActors(EGameObjectType InObjectType, int32 InCou
 			FVector SpawnPoint = SpawnArea->GetRandomPoint();
 			SpawnPoint.Z = 0.f;
 			
-			if (Player && FoundBots.IsValidIndex(0) && FoundExit.IsValidIndex(0))
+			if (PlayerPawn && FoundBots.IsValidIndex(0) && FoundExit.IsValidIndex(0))
 			{
-				float DistanceToPlayer = (SpawnPoint - Player->GetActorLocation()).Size();
+				float DistanceToPlayer = (SpawnPoint - PlayerPawn->GetActorLocation()).Size();
 
 				if (DistanceToPlayer <= 300.f)
 				{

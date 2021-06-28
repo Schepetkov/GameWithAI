@@ -155,17 +155,23 @@ void ABotAIController::OnStimulusReaction(AActor* Actor, FAIStimulus Stimulus)
 		{
 			if (AItemBase* SpotItem = Cast<AItemBase>(Actor))
 			{
-				if (SpotItem->GetLastItemOwner() == ControlledBot)
+				if (SpotItem->GetLastItemOwner() && SpotItem->GetLastItemOwner() == ControlledBot)
 				{
-					BotBlackboard->SetValueAsVector("NoiseLocation", SpotItem->GetActorLocation());
-					BotBlackboard->SetValueAsBool("HearNoise", true);
+					return;
 				}
-				else
+				
+				if (BotBlackboard->GetValueAsBool("HearNoise"))
 				{
 					BotBlackboard->SetValueAsObject("NoiseItemToPickUp", SpotItem);
 					BotBlackboard->SetValueAsVector("NoiseLocation", SpotItem->GetActorLocation());
-					BotBlackboard->SetValueAsBool("HearNoise", true);
 					BotBlackboard->SetValueAsBool("NewNoise", true);
+				
+				}
+				else
+				{
+					BotBlackboard->SetValueAsBool("HearNoise", true);
+					BotBlackboard->SetValueAsObject("NoiseItemToPickUp", SpotItem);
+					BotBlackboard->SetValueAsVector("NoiseLocation", SpotItem->GetActorLocation());
 				}
 			}
 		}
