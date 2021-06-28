@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "BotAIController.h"
 #include "Pawns/Bots/BotBase.h"
 #include "GameObjects/ItemBase.h"
@@ -65,19 +64,24 @@ void ABotAIController::OnPossess(APawn* InPawn)
 
 void ABotAIController::ResetBot()
 {
-	BotBlackboard->SetValueAsBool("NewNoise", false);
-	BotBlackboard->SetValueAsBool("HearNoise", false);
-	BotBlackboard->SetValueAsBool("BotLostPlayer", false);
+	if (BotBlackboard)
+	{
+		BotBlackboard->SetValueAsBool("NewNoise", false);
+		BotBlackboard->SetValueAsBool("HearNoise", false);
+		BotBlackboard->SetValueAsBool("BotLostPlayer", false);
+	}
 }
 
 void ABotAIController::BotLostPlayer()
 {
-	BotBlackboard->SetValueAsBool("SeePlayer", false);
-	BotBlackboard->SetValueAsBool("BotLostPlayer", true);
+	if (BotBlackboard)
+	{
+		BotBlackboard->SetValueAsBool("SeePlayer", false);
+		BotBlackboard->SetValueAsBool("BotLostPlayer", true);
+	}
 	
 	if (ControlledBot && ControlledBot->GetBotTarget())
 	{
-		
 		ControlledBot->GetBotTarget()->ChangeCaughtBotsState(false);
 		ControlledBot->SetBotTarget(nullptr);
 	}
@@ -85,6 +89,11 @@ void ABotAIController::BotLostPlayer()
 
 bool ABotAIController::CanChasePlaer()
 {
+	if (BotBlackboard == nullptr)
+	{
+		return false;
+	}
+	
 	if (ControlledBot == nullptr)
 	{
 		return false;
@@ -103,19 +112,22 @@ bool ABotAIController::CanChasePlaer()
 
 void ABotAIController::StartLookAround()
 {
-	if (ControlledBot == nullptr)
-	{
-		return;
-	}
-	
 	float LookAroundTime = UKismetMathLibrary::RandomFloatInRange(float(ControlledBot->GetAISettingsRowHandle().LooksAroundMinTime), float(ControlledBot->GetAISettingsRowHandle().LooksAroundMaxTime));
-	BotBlackboard->SetValueAsFloat("LookAroundTime", LookAroundTime);
-
-	ControlledBot->StartLookAround();
+	
+	if (BotBlackboard && ControlledBot)
+	{
+		BotBlackboard->SetValueAsFloat("LookAroundTime", LookAroundTime);
+		ControlledBot->StartLookAround();
+	}
 }
 
 void ABotAIController::OnStimulusReaction(AActor* Actor, FAIStimulus Stimulus)
 {
+	if (BotBlackboard == nullptr)
+	{
+		return;
+	}
+	
 	if (ControlledBot == nullptr)
 	{
 		return;
@@ -182,6 +194,11 @@ void ABotAIController::OnStimulusReaction(AActor* Actor, FAIStimulus Stimulus)
 
 void ABotAIController::PickUpNoiseItem()
 {
+	if (BotBlackboard == nullptr)
+	{
+		return;
+	}
+	
 	if (BotBlackboard->GetValueAsObject("NoiseItemToPickUp") && ControlledBot)
 	{
 		if (AItemBase* ItemToPickUp = Cast<AItemBase>(BotBlackboard->GetValueAsObject("NoiseItemToPickUp")))
