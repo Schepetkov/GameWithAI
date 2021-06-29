@@ -79,11 +79,6 @@ void ABotAIController::ResetNewNoiseState()
 	}
 	
 	BotBlackboard->SetValueAsBool("NewNoise", false);
-	
-	if (DetectedItem)
-	{
-		BotBlackboard->SetValueAsVector("DetectedItemLocation", DetectedItem->GetActorLocation());
-	}
 }
 
 void ABotAIController::ResetBotLostPlayerState()
@@ -177,8 +172,6 @@ void ABotAIController::OnStimulusReaction(AActor* Actor, FAIStimulus Stimulus)
 		{
 			if (AItemBase* SpotItem = Cast<AItemBase>(Actor))
 			{
-				DetectedItem = SpotItem;
-				
 				if (SpotItem->GetLastItemOwner() && SpotItem->GetLastItemOwner() == ControlledBot)
 				{
 					return;

@@ -8,7 +8,6 @@
 #include "BotAIController.generated.h"
 
 class ABotBase;
-class AItemBase;
 
 UCLASS()
 class HIDEANDSEEKWITHAI_API ABotAIController : public AAIController
@@ -29,7 +28,6 @@ protected:
 
 	ABotBase* ControlledBot = nullptr;
 	UBlackboardComponent* BotBlackboard = nullptr;
-	AItemBase* DetectedItem = nullptr;
 
 protected:
 	void OnPossess(APawn* InPawn) override;
