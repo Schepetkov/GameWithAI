@@ -8,6 +8,7 @@
 #include "BotAIController.generated.h"
 
 class ABotBase;
+class AItemBase;
 
 UCLASS()
 class HIDEANDSEEKWITHAI_API ABotAIController : public AAIController
@@ -26,11 +27,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UBehaviorTree* BTAsset = nullptr;
 
-	//UPROPERTY(BlueprintReadWrite)
 	ABotBase* ControlledBot = nullptr;
-
-	UPROPERTY(BlueprintReadOnly)
 	UBlackboardComponent* BotBlackboard = nullptr;
+	AItemBase* DetectedItem = nullptr;
 
 protected:
 	void OnPossess(APawn* InPawn) override;
@@ -41,6 +40,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ResetBot();
 
+	UFUNCTION(BlueprintCallable)
+	void ResetNewNoiseState();
+
+	UFUNCTION(BlueprintCallable)
+	void ResetBotLostPlayerState();
+	
 	UFUNCTION(BlueprintCallable)
 	void BotLostPlayer();
 

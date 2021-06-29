@@ -66,8 +66,30 @@ void ABotAIController::ResetBot()
 {
 	if (BotBlackboard)
 	{
-		BotBlackboard->SetValueAsBool("NewNoise", false);
 		BotBlackboard->SetValueAsBool("HearNoise", false);
+		BotBlackboard->SetValueAsBool("BotLostPlayer", false);
+	}
+}
+
+void ABotAIController::ResetNewNoiseState()
+{
+	if (BotBlackboard == nullptr)
+	{
+		return;
+	}
+	
+	BotBlackboard->SetValueAsBool("NewNoise", false);
+	
+	if (DetectedItem)
+	{
+		BotBlackboard->SetValueAsVector("DetectedItemLocation", DetectedItem->GetActorLocation());
+	}
+}
+
+void ABotAIController::ResetBotLostPlayerState()
+{
+	if (BotBlackboard)
+	{
 		BotBlackboard->SetValueAsBool("BotLostPlayer", false);
 	}
 }
@@ -155,6 +177,8 @@ void ABotAIController::OnStimulusReaction(AActor* Actor, FAIStimulus Stimulus)
 		{
 			if (AItemBase* SpotItem = Cast<AItemBase>(Actor))
 			{
+				DetectedItem = SpotItem;
+				
 				if (SpotItem->GetLastItemOwner() && SpotItem->GetLastItemOwner() == ControlledBot)
 				{
 					return;
@@ -162,10 +186,14 @@ void ABotAIController::OnStimulusReaction(AActor* Actor, FAIStimulus Stimulus)
 				
 				if (BotBlackboard->GetValueAsBool("HearNoise"))
 				{
-					BotBlackboard->SetValueAsObject("NoiseItemToPickUp", SpotItem);
-					BotBlackboard->SetValueAsVector("NoiseLocation", SpotItem->GetActorLocation());
-					BotBlackboard->SetValueAsBool("NewNoise", true);
-				
+					if (SpotItem->GetLastItemOwner() && SpotItem->GetLastItemOwner() != ControlledBot)
+					{
+						BotBlackboard->SetValueAsBool("NewNoise", true);
+						BotBlackboard->SetValueAsObject("NoiseItemToPickUp", SpotItem);
+						BotBlackboard->SetValueAsVector("NoiseLocation", SpotItem->GetActorLocation());
+					}
+					
+					return;
 				}
 				else
 				{
